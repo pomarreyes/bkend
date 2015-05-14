@@ -1,42 +1,18 @@
 
 /*
- * routes/index.js
- * 
- * Routes contains the functions (callbacks) associated with request urls.
- */
+ * routes/restaurants.js
+*/
 
 // dependencies
 var geocoder = require('geocoder');
 
-// our db model
-var Person = require("../models/model.js");
+//  db model for restaurant
+var Restaurant = require("../models/restaurant.js");
+
+
 
 /**
- * GET '/'
- * Default home route. Just relays a success message back.
- * @param  {Object} req
- * @return {Object} json
- */
-
-exports.index = function(req, res) {
-	
-	console.log("main route requested");
-
-	var data = {
-		status: 'OK',
-		message: 'Welcome to the itpeeps-map v1 API'
-	}
-
-	// respond back with the data
-	res.json(data);
-
-}
-
-/**
- * POST '/api/create'
- * Receives a POST request of the new user and location, saves to db, responds back
- * @param  {Object} req. An object containing the different attributes of the Person
- * @return {Object} JSON
+ * POST '/api/restaurants'
  */
 
 exports.create = function(req,res){
@@ -44,9 +20,9 @@ exports.create = function(req,res){
 	console.log(req.body);
 
 	// pull out the name and location
-	var nombre = req.body.nom;
-	var edificio = req.body.edif;
-	var numero = req.body.num;
+	var name = req.body.name;
+	var direction = req.body.direction;
+	var location = req.body.location;
 	//now, geocode that location
 	geocoder.geocode(location, function ( err, data ) {
 
@@ -59,24 +35,22 @@ exports.create = function(req,res){
   	}
 
 	  var _sala = Sala({
-	  	nom: nombre,
-	  	edif: edificio,
-	  	num: numero
+	  	name: name,
+	  	direction: direction,
+	  	location: location
 	  });
 
-	  // now, save that person to the database
-		// mongoose method, see http://mongoosejs.com/docs/api.html#model_Model-save	  
 	  _sala.save(function(err,data){
 	  	// if err saving, respond back with error
 	  	if (err){
-	  		var jsonData = {status:'ERROR', message: 'Error saving person'};
+	  		var jsonData = {status:'ERROR', message: 'Error saving restaurant'};
 	  		return res.json(jsonData);
 	  	}
 
 	  	console.log('saved a new sala!');
 	  	console.log(data);
 
-	  	// now return the json data of the new person
+	  	// now return the json data of the new restaurant
 	  	var jsonData = {
 	  		status: 'OK',
 	  		_sala: data
@@ -101,18 +75,18 @@ exports.create = function(req,res){
 // 	var requestedId = req.param('id');
 
 // 	// mongoose method, see http://mongoosejs.com/docs/api.html#model_Model.findById
-// 	Person.findById(requestedId, function(err,data){
+// 	restaurant.findById(requestedId, function(err,data){
 
 // 		// if err or no user found, respond with error 
 // 		if(err || data == null){
-//   		var jsonData = {status:'ERROR', message: 'Could not find that person'};
+//   		var jsonData = {status:'ERROR', message: 'Could not find that restaurant'};
 //   		 return res.json(jsonData);
 //   	}
 
 //   	// otherwise respond with JSON data of the user
 //   	var jsonData = {
 //   		status: 'OK',
-//   		person: data
+//   		restaurant: data
 //   	}
 
 //   	return res.json(jsonData);
@@ -129,7 +103,7 @@ exports.create = function(req,res){
 exports.getAll = function(req,res){
 
 	// mongoose method, see http://mongoosejs.com/docs/api.html#model_Model.find
-	Person.find(function(err, data){
+	restaurant.find(function(err, data){
 		// if err or no users found, respond with error 
 		if(err || data == null){
   		var jsonData = {status:'ERROR', message: 'Could not find salas'};
@@ -137,12 +111,6 @@ exports.getAll = function(req,res){
   	}
 
   	// otherwise, respond with the data	
-
-  	// var jsonData = {
-  	// 	status: 'OK',
-  	// 	sala: data
-  	// }	
-
   	res.json(data);
 
 	})
@@ -153,7 +121,7 @@ exports.getAll = function(req,res){
 //  * POST '/api/update/:id'
 //  * Receives a POST request with data of the user to update, updates db, responds back
 //  * @param  {String} req.param('id'). The userId to update
-//  * @param  {Object} req. An object containing the different attributes of the Person
+//  * @param  {Object} req. An object containing the different attributes of the restaurant
 //  * @return {Object} JSON
 //  */
 
@@ -191,22 +159,22 @@ exports.getAll = function(req,res){
 // 	  	locationGeo: lnglat_array
 // 	  };
 
-// 	  // now, update that person
+// 	  // now, update that restaurant
 // 		// mongoose method, see http://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate  
-// 	  Person.findByIdAndUpdate(requestedId, dataToUpdate, function(err,data){
+// 	  restaurant.findByIdAndUpdate(requestedId, dataToUpdate, function(err,data){
 // 	  	// if err saving, respond back with error
 // 	  	if (err){
-// 	  		var jsonData = {status:'ERROR', message: 'Error updating person'};
+// 	  		var jsonData = {status:'ERROR', message: 'Error updating restaurant'};
 // 	  		return res.json(jsonData);
 // 	  	}
 
-// 	  	console.log('updated the person!');
+// 	  	console.log('updated the restaurant!');
 // 	  	console.log(data);
 
-// 	  	// now return the json data of the new person
+// 	  	// now return the json data of the new restaurant
 // 	  	var jsonData = {
 // 	  		status: 'OK',
-// 	  		person: data
+// 	  		restaurant: data
 // 	  	}
 
 // 	  	return res.json(jsonData);
@@ -229,9 +197,9 @@ exports.getAll = function(req,res){
 // 	var requestedId = req.param('id');
 
 // 	// Mongoose method, http://mongoosejs.com/docs/api.html#model_Model.findByIdAndRemove
-// 	Person.findByIdAndRemove(requestedId,function(err, data){
+// 	restaurant.findByIdAndRemove(requestedId,function(err, data){
 // 		if(err || data == null){
-//   		var jsonData = {status:'ERROR', message: 'Could not find that person to delete'};
+//   		var jsonData = {status:'ERROR', message: 'Could not find that restaurant to delete'};
 //   		return res.json(jsonData);
 // 		}
 

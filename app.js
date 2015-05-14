@@ -10,7 +10,7 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
-// the ExpressJS App
+// the ExpressJS app
 var app = express();
 
 // configuration of expressjs settings for the web server.
@@ -32,7 +32,7 @@ console.log("connected to database");
 
 app.all('*', function(req, res, next){
   if (!req.get('Origin')) return next();
-  // use "*" here to accept any origin
+    // use "*" here to accept any origin
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'PUT');
   res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
@@ -51,19 +51,16 @@ app.all('*', function(req, res, next){
 // UPDATE - http://appname.com/api/update/:id (PUT)
 // DELETE - http://appname.com/api/delete/:id (DELETE)
 
-// ROUTES, logic is in routes/index.js
+// ROUTES, logic is in routes/restaurants.js
 
-var routes = require('./routes/index.js');
-
-// home route is not really an API route, but does respond back
-app.get('/', routes.index); // calls index function in /routes/index.js
+var restaurants_routes = require('./routes/restaurants.js');
 
 // API routes
-app.post('/api/create', routes.create); // API create route and callback (see /routes/index.js)
-app.get('/api/get/:id', routes.getOne); // API retrieve 1 route and callback (see /routes/index.js)
-app.get('/api/get', routes.getAll); // API retrieve all route and callback (see /routes/index.js)
-app.post('/api/update/:id', routes.update); // API update route and callback (see /routes/index.js)
-app.get('/api/delete/:id', routes.remove); // API delete route and callback (see /routes/index.js)
+app.post('/api/restaurants', restaurants_routes.create); // API create route and callback (see /routes/index.js)
+//app.get('/api/get/:id'restaurants_routes.getOne); // API retrieve 1 route and callback (see /routes/index.js)
+app.get('/api/restaurants', restaurants_routes.getAll); // API retrieve all route and callback (see /routes/index.js)
+//app.post('/api/update/:id'restaurants_routes.update); // API update route and callback (see /routes/index.js)
+//app.get('/api/delete/:id'restaurants_routes.remove); // API delete route and callback (see /routes/index.js)
 
 // if route not found, respond with 404
 app.use(function(req, res, next){
